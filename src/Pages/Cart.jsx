@@ -1,66 +1,73 @@
-import React, { useState } from "react";
-import { pizzaCart } from "../utils/pizzas";
+import React from "react";
+import { useCart } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 export default function Cart() {
-    const [cart, setCart] = useState(pizzaCart);
+  const { cart, addToCart, decreaseQuantity, removeFromCart, getTotal } =
+    useCart();
 
-    const incrementar = (id) => {
-        setCart((prevCart) =>
-            prevCart.map((item) =>
-            item.id === id ? { ...item, count: item.count + 1 } : item
-            )
-        );
-    };
-
-    const disminuir = (id) => {
-        setCart((prevCart) =>
-            prevCart
-                .map((item) =>
-                    item.id === id ? { ...item, count: item.count - 1 } : item
-                )
-                .filter((item) => item.count > 0)
-            );
-        };
-
-  const total = cart.reduce((acc, item) => acc + item.price * item.count, 0);
-
+  if (cart.length === 0) {
     return (
-        <div className="container mt-4">
-            <h3>Detalles del pedido:</h3>
-            {cart.map((pizza) => (
-        <div
-            key={pizza.id}
-            className="d-flex align-items-center justify-content-between border-bottom py-2"
-        >
-            <img
-            src={pizza.img}
-            alt={pizza.name}
-            style={{ width: "60px", borderRadius: "8px" }}
-            />
-            <span>{pizza.name}</span>
-            <span>${pizza.price.toLocaleString()}</span>
-            <div className="d-flex align-items-center">
-            <button
-                className="btn btn-outline-danger"
-                onClick={() => disminuir(pizza.id)}
-            >
-                -
-            </button>
-            <span className="mx-2">{pizza.count}</span>
-            <button
-                className="btn btn-outline-primary"
-                onClick={() => incrementar(pizza.id)}
-            >
-                +
-            </button>
-            </div>
-        </div>
-        ))}
-
-        <div className="d-flex justify-content-between align-items-center mt-4">
-            <h4>Total: ${total.toLocaleString()}</h4>
-            <button className="btn btn-dark">Pagar</button>
-        </div>
-    </div>
+      <div className="container text-center mt-5">
+        <h3>Tu carrito está vacío 🛒</h3>
+        <Link to="/" className="btn btn-primary mt-3">
+          Volver al inicio
+        </Link>
+      </div>
     );
+  }
+
+  return (
+    <div className="container mt-4">
+      <h2 className="mb-4">🛍️ Carrito de Compras</h2>
+      {cart.map((item) => (
+        <div key={item.id} className="card mb-3">
+          <div className="row g-0 align-items-center">
+            <div className="col-md-2">
+              <img
+                src={item.img}
+                alt={item.name}
+                className="img-fluid rounded-start"
+              />
+            </div>
+            <div className="col-md-6">
+              <div className="card-body">
+                <h5 className="card-title">{item.name}</h5>
+                <p className="card-text">Precio: ${item.price}</p>
+                <p className="card-text">
+                  Subtotal: ${(item.price * item.quantity).toFixed(2)}
+                </p>
+              </div>
+            </div>
+            <div className="col-md-4 text-center">
+              <div className="d-flex justify-content-center align-items-center gap-2">
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={() => decreaseQuantity(item.id)}
+                >
+                  -
+                </button>
+                <span>{item.quantity}</span>
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={() => addToCart(item)}
+                >
+                  +
+                </button>
+              </div>
+              <button
+                className="btn btn-danger mt-2"
+                onClick={() => removeFromCart(item.id)}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="text-end">
+        <h4>Total: ${getTotal().toFixed(2)}</h4>
+      </div>
+    </div>
+  );
 }

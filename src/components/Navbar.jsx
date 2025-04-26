@@ -1,8 +1,12 @@
-// src/components/Navbar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 export default function Navbar() {
+  const { getTotal } = useCart();
+  const total = getTotal();
+
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
       <Link className="navbar-brand" to="/">
@@ -32,7 +36,7 @@ export default function Navbar() {
           </li>
         </ul>
         <Link className="btn btn-outline-success" to="/cart">
-          🛒 Total: $0
+          🛒 {typeof total === "number" ? total.toFixed(2) : "0.00"}
         </Link>
       </div>
     </nav>

@@ -7,13 +7,13 @@ export default function Header() {
       style={{
         height: "50vh",
         alignItems: "center",
-        alignContent: "center", // Mantiene una buena altura
+        alignContent: "center", 
         backgroundImage:
           "url('https://images.pexels.com/photos/3915857/pexels-photo-3915857.jpeg?auto=compress&cs=tinysrgb&w=600')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        borderRadius: "10px", // Bordes redondeados
+        borderRadius: "10px", 
         padding: "2rem",
       }}
     >
