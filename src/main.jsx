@@ -5,13 +5,17 @@ import "./index.css";
 import App from "./App.jsx";
 
 
-// Importa el provider
 import { CartProvider } from "./context/CartContext.jsx";
+import { UserProvider } from "./context/UserContext.jsx"; 
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <CartProvider>
-      <App />
-    </CartProvider>
+    <UserProvider>
+      {" "}
+      {/* 👈 Envuelves todo en UserProvider */}
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </UserProvider>
   </StrictMode>
 );

@@ -1,26 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); 
+  const [messageType, setMessageType] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const { login } = useUser(); 
+  const navigate = useNavigate(); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { email, password } = formData;
 
-    
+
     if (!email || !password) {
       setMessage("⚠️ Todos los campos son obligatorios.");
       setMessageType("error");
@@ -33,14 +27,20 @@ export default function Login() {
       return;
     }
 
-    
-    setMessage("✅ Inicio de sesión exitoso. ¡Bienvenido!");
+   
+    login({ email }); 
+    setMessage("✅ Inicio de sesión exitoso.");
     setMessageType("success");
+
+    
+    setTimeout(() => {
+      navigate("/"); 
+    }, 1000);
   };
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">🔑 Iniciar Sesión</h2>
+      <h2 className="text-center">🔐 Iniciar Sesión</h2>
       <div className="row justify-content-center">
         <div className="col-md-6">
           <form
@@ -51,27 +51,24 @@ export default function Login() {
               <label className="form-label">📧 Email</label>
               <input
                 type="email"
-                name="email"
                 className="form-control"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">🔒 Contraseña</label>
+              <label className="form-label">🔑 Contraseña</label>
               <input
                 type="password"
-                name="password"
                 className="form-control"
-                value={formData.password}
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
 
-            
             {message && (
               <div
                 className={`alert ${
@@ -83,7 +80,7 @@ export default function Login() {
             )}
 
             <button type="submit" className="btn btn-primary w-100">
-              🚀 Iniciar Sesión
+              🚪 Iniciar Sesión
             </button>
           </form>
         </div>

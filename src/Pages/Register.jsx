@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -8,7 +11,9 @@ export default function Register() {
   });
 
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // "success" o "error"
+  const [messageType, setMessageType] = useState(""); 
+  
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setFormData({
@@ -17,11 +22,11 @@ export default function Register() {
     });
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const { email, password, confirmPassword } = formData;
 
-    
     if (!email || !password || !confirmPassword) {
       setMessage("⚠️ Todos los campos son obligatorios.");
       setMessageType("error");
@@ -40,9 +45,13 @@ export default function Register() {
       return;
     }
 
-   
+
     setMessage("✅ Registro exitoso. ¡Bienvenido!");
     setMessageType("success");
+
+    setTimeout(() => {
+      navigate("/");
+    }, 1000);
   };
 
   return (

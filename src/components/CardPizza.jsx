@@ -1,9 +1,7 @@
 import React from "react";
-import { useCart } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
-const CardPizza = ({ pizza }) => {
-  const { addToCart } = useCart(); 
-
+const CardPizza = ({ pizza, addToCart }) => {
   if (!pizza) return null;
 
   return (
@@ -19,9 +17,21 @@ const CardPizza = ({ pizza }) => {
         </ul>
         <div className="d-flex justify-content-between align-items-center">
           <span className="fw-bold">${pizza.price}</span>
-          <button className="btn btn-primary" onClick={() => addToCart(pizza)}>
-            Añadir al carrito
-          </button>
+          <div>
+            <button
+              className="btn btn-primary me-2"
+              onClick={() => addToCart(pizza)}
+            >
+              Añadir al carrito
+            </button>
+            {/* Link para redirigir a la página de la pizza */}
+            <Link
+              to={`/pizza/${pizza.id}`} // Utilizamos el id de la pizza para la ruta dinámica
+              className="btn btn-secondary"
+            >
+              Ver detalles
+            </Link>
+          </div>
         </div>
       </div>
     </div>

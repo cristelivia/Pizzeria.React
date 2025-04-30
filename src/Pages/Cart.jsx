@@ -1,10 +1,12 @@
 import React from "react";
 import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext"; 
 import { Link } from "react-router-dom";
 
 export default function Cart() {
   const { cart, addToCart, decreaseQuantity, removeFromCart, getTotal } =
     useCart();
+  const { token } = useUser(); 
 
   if (cart.length === 0) {
     return (
@@ -67,6 +69,21 @@ export default function Cart() {
       ))}
       <div className="text-end">
         <h4>Total: ${getTotal().toFixed(2)}</h4>
+
+        {/* Botón de Pagar */}
+        <button
+          className="btn btn-success mt-3"
+          disabled={!token} 
+        >
+          Pagar
+        </button>
+
+        {/* Mensaje si el token es falso */}
+        {!token && (
+          <p className="text-danger mt-2">
+            Debes iniciar sesión para poder pagar.
+          </p>
+        )}
       </div>
     </div>
   );
