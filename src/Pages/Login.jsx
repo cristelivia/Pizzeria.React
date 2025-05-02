@@ -3,17 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { login } = useUser();
+  const navigate = useNavigate();
+  const [error, setError] = useState(""); 
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
-  const { login } = useUser(); 
-  const navigate = useNavigate(); 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const { email, password } = formData;
 
     if (!email || !password) {
       setMessage("⚠️ Todos los campos son obligatorios.");
@@ -21,21 +32,24 @@ export default function Login() {
       return;
     }
 
-    if (password.length < 6) {
-      setMessage("⚠️ La contraseña debe tener al menos 6 caracteres.");
+    try {
+      await login({ email, password });
+
+      setMessage("✅ ¡Inicio de sesión exitoso!");
+      setMessageType("success");
+
+      setTimeout(() => {
+        console.log("🎉 Login completado, redirigiendo al home...");
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      console.error(
+        "❌ Error en login:",
+        error.response?.data || error.message
+      );
+      setError(error.response?.data?.error || "Error al iniciar sesión.");
       setMessageType("error");
-      return;
     }
-
-   
-    login({ email }); 
-    setMessage("✅ Inicio de sesión exitoso.");
-    setMessageType("success");
-
-    
-    setTimeout(() => {
-      navigate("/"); 
-    }, 1000);
   };
 
   return (
@@ -51,9 +65,10 @@ export default function Login() {
               <label className="form-label">📧 Email</label>
               <input
                 type="email"
+                name="email"
                 className="form-control"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -62,9 +77,10 @@ export default function Login() {
               <label className="form-label">🔑 Contraseña</label>
               <input
                 type="password"
+                name="password"
                 className="form-control"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -79,8 +95,10 @@ export default function Login() {
               </div>
             )}
 
+            {error && <div className="alert alert-danger">{error}</div>}
+
             <button type="submit" className="btn btn-primary w-100">
-              🚪 Iniciar Sesión
+              🚀 Iniciar Sesión
             </button>
           </form>
         </div>

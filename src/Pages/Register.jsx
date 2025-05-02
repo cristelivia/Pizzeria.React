@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-
+import { useUser } from "../context/UserContext"; 
 
 export default function Register() {
+  const { register } = useUser(); 
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -11,9 +13,7 @@ export default function Register() {
   });
 
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); 
-  
-  const navigate = useNavigate(); 
+  const [messageType, setMessageType] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -22,8 +22,7 @@ export default function Register() {
     });
   };
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password, confirmPassword } = formData;
 
@@ -45,13 +44,21 @@ export default function Register() {
       return;
     }
 
+    try {
+      
+      await register({ email, password });
 
-    setMessage("✅ Registro exitoso. ¡Bienvenido!");
-    setMessageType("success");
+      setMessage("✅ Registro exitoso. ¡Bienvenido!");
+      setMessageType("success");
 
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
+      
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      setMessage("⚠️ Error al registrarse. Intenta de nuevo.");
+      setMessageType("error");
+    }
   };
 
   return (

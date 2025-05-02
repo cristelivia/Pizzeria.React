@@ -1,90 +1,128 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { useUser } from "../context/UserContext"; 
-import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export default function Cart() {
-  const { cart, addToCart, decreaseQuantity, removeFromCart, getTotal } =
-    useCart();
-  const { token } = useUser(); 
+  const {
+    cart,
+    addToCart,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
+    getTotal,
+  } = useCart();
+  const { token } = useUser();
+  console.log("Token en UserContext:", token);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
-  if (cart.length === 0) {
-    return (
-      <div className="container text-center mt-5">
-        <h3>Tu carrito está vacío 🛒</h3>
-        <Link to="/" className="btn btn-primary mt-3">
-          Volver al inicio
-        </Link>
-      </div>
-    );
-  }
+  const handleCheckout = async () => {
+    if (cart.length === 0) {
+      setMessage("⚠️ El carrito está vacío.");
+      setMessageType("error");
+      return;
+    }
+
+    try {
+      console.log("Token en la solicitud:", token);
+      const response = await fetch("http://localhost:5000/api/checkouts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cart }),
+      });
+
+      if (!response.ok) throw new Error("Error al procesar el pago.");
+
+      await response.json();
+      setMessage("✅ ¡Compra realizada con éxito!");
+      setMessageType("success");
+      clearCart();
+    } catch (error) {
+      setMessage(error.message || "⚠️ Algo salió mal. Intenta de nuevo.");
+      setMessageType("error");
+    }
+  };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">🛍️ Carrito de Compras</h2>
-      {cart.map((item) => (
-        <div key={item.id} className="card mb-3">
-          <div className="row g-0 align-items-center">
-            <div className="col-md-2">
-              <img
-                src={item.img}
-                alt={item.name}
-                className="img-fluid rounded-start"
-              />
-            </div>
-            <div className="col-md-6">
-              <div className="card-body">
-                <h5 className="card-title">{item.name}</h5>
-                <p className="card-text">Precio: ${item.price}</p>
-                <p className="card-text">
-                  Subtotal: ${(item.price * item.quantity).toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <div className="col-md-4 text-center">
-              <div className="d-flex justify-content-center align-items-center gap-2">
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={() => decreaseQuantity(item.id)}
-                >
-                  -
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  className="btn btn-outline-secondary"
-                  onClick={() => addToCart(item)}
-                >
-                  +
-                </button>
-              </div>
-              <button
-                className="btn btn-danger mt-2"
-                onClick={() => removeFromCart(item.id)}
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
-      <div className="text-end">
-        <h4>Total: ${getTotal().toFixed(2)}</h4>
+    <div className="container mt-5">
+      <h2 className="text-center">🛒 Carrito de Compras</h2>
 
-        {/* Botón de Pagar */}
-        <button
-          className="btn btn-success mt-3"
-          disabled={!token} 
+      {message && (
+        <div
+          className={`alert ${
+            messageType === "success" ? "alert-success" : "alert-danger"
+          }`}
         >
-          Pagar
-        </button>
+          {message}
+        </div>
+      )}
 
-        {/* Mensaje si el token es falso */}
-        {!token && (
-          <p className="text-danger mt-2">
-            Debes iniciar sesión para poder pagar.
-          </p>
-        )}
-      </div>
+      {cart.length > 0 ? (
+        <div className="table-responsive">
+          <table className="table align-middle">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cart.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.name}</td>
+                  <td>${item.price}</td>
+                  <td>{item.quantity}</td>
+                  <td>${item.price * item.quantity}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-outline-primary me-1"
+                      onClick={() => addToCart(item)}
+                    >
+                      ➕
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-warning me-1"
+                      onClick={() => decreaseQuantity(item.id)}
+                    >
+                      ➖
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan="3" className="text-end fw-bold">
+                  Total:
+                </td>
+                <td colSpan="2" className="fw-bold">
+                  ${getTotal().toFixed(2)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-center">Tu carrito está vacío.</p>
+      )}
+
+      {cart.length > 0 && (
+        <div className="text-center mt-3">
+          <button className="btn btn-success" onClick={handleCheckout}>
+            🛍️ Proceder a la compra
+          </button>
+        </div>
+      )}
     </div>
   );
 }

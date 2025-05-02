@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
 import { useUser } from "../context/UserContext";
+import { useCart } from "../context/CartContext";
 
 export default function Navbar() {
-  const { cart, getTotal } = useCart();
-  const { isAuthenticated, logout } = useUser();
+  const { isAuthenticated, logout, user } = useUser();
+  console.log("🔍 Navbar - isAuthenticated:", isAuthenticated);
+  console.log("👤 Navbar - user:", user);
+  const { cart } = useCart();
+ 
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,13 +17,19 @@ export default function Navbar() {
     navigate("/login");
   };
 
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    setTick((t) => t + 1);
+  }, [isAuthenticated]);
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
       <Link className="navbar-brand" to="/">
         🍕 PizzaApp
       </Link>
+
       <div className="collapse navbar-collapse">
-        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul className="navbar-nav ms-auto">
           <li className="nav-item">
             <Link className="nav-link" to="/">
               🏠 Home
@@ -28,7 +38,7 @@ export default function Navbar() {
 
           <li className="nav-item">
             <Link className="nav-link" to="/cart">
-              🛒 Total: ${getTotal().toFixed(2)}
+              🛒 Carrito {cart.length > 0 && `(${cart.length})`}
             </Link>
           </li>
 
@@ -36,12 +46,13 @@ export default function Navbar() {
             <>
               <li className="nav-item">
                 <Link className="nav-link" to="/profile">
-                  👤 Profile
+                  👤 {user?.email || "Profile"}
                 </Link>
               </li>
+
               <li className="nav-item">
                 <button
-                  className="btn btn-link nav-link"
+                  className="btn btn-outline-light ms-2"
                   onClick={handleLogout}
                 >
                   🔓 Logout

@@ -9,18 +9,12 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPizzas = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/pizzas");
-        const data = await res.json();
-
-      
-        console.log("Pizzas desde backend:", data);
-
-        setPizzas(data); 
-      } catch (error) {
-        console.error("Error al obtener las pizzas:", error);
-      }
+      const res = await fetch("http://localhost:5000/api/pizzas");
+      if (!res.ok) throw new Error("Error al obtener las pizzas");
+      const data = await res.json();
+      setPizzas(data);
     };
+
 
     fetchPizzas();
   }, []);

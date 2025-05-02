@@ -26,7 +26,7 @@ const CardPizza = ({ pizza, addToCart }) => {
             </button>
             {/* Link para redirigir a la página de la pizza */}
             <Link
-              to={`/pizza/${pizza.id}`} // Utilizamos el id de la pizza para la ruta dinámica
+              to={`/pizza/${pizza.id}`} 
               className="btn btn-secondary"
             >
               Ver detalles
