@@ -94,7 +94,7 @@ useEffect(() => {
         isAuthenticated,
         login,
         logout,
-        loading, git
+        loading, 
       }}
     >
       {children}
